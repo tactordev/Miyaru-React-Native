@@ -1,74 +1,119 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, Text, Alert, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Header from '@/components/Header';
+import * as Font from 'expo-font';
+import { useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+type RootStackParamList = {
+  index: undefined;
+  report: undefined;
+  sighting: undefined;
+};
 
 export default function HomeScreen() {
+
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+  function changeScreen(id: string) {
+    if (id === "sighting") {
+      console.log("sighting")
+      navigation.navigate('sighting');
+
+    } else {
+      console.log("alert")
+      console.log(id)
+      Alert.alert('Error: Form not chosen.');
+    }
+  }
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'Poppins-Medium': require('@/assets/fonts/Poppins-Medium.ttf'),
+      });
+    }
+    loadFonts();
+  }, []);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View>
+      <View>
+        <Image source={require('@/assets/images/miyaru/homeBackground.png')} style={styles.backgroundImage} />
+      </View>
+      <Header />
+
+      
+      
+
+      <View style={styles.titleContainer}>
+        <Text style={{color: "#fff", fontSize: 25, fontWeight: 700, margin: 30, textAlign: 'center', fontFamily: 'Poppins-Medium', lineHeight: 40}}>Welcome to the Miyaru Shark App!</Text>
+      </View>
+
+      
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.changeScreenButton} onPress={() => changeScreen('sighting')}>
+          <Text nativeID="sighting" style={[styles.button, {fontFamily: 'Poppins-Medium'}]}>Submit Sighting</Text>
+        </TouchableOpacity>
+      </View>
+
+      <LinearGradient 
+        colors={['transparent', '#020a33', '#020a33', '#020a33']}
+        style={styles.footer}
+      >
+        <Image source={require('@/assets/images/miyaru/footer.png')} style={{width: Dimensions.get('window').width, height: 200}} />
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  buttonsContainer: {
+    marginTop: 100,
+  },
+  button: {
+    fontWeight: 500,
+    fontStyle: 'normal',
+    fontSize: 15,
+  },
+  changeScreenButton: { 
+    display: 'flex',
+    backgroundColor: '#00c2ff',
+    textAlign: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    padding: 10,
+    width: Dimensions.get('window').width / 1.25,
+    marginLeft: (Dimensions.get('window').width - (Dimensions.get('window').width / 1.25)) / 2  ,
+    borderRadius: 20,
+    boxShadow: '0px  5px 15px rgba(0, 0, 0, 1)',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  backgroundImage: {
+    display: 'flex',
+    width: Dimensions.get('window').width / 1,
+    height: Dimensions.get('window').height / 1.25,
     position: 'absolute',
+    top: 130,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -100,
+    marginTop: 5,
   },
+  titleContainer: {
+    backgroundColor: '#010932',
+    color: '#120021',
+    zIndex: 10,
+    marginTop: Dimensions.get('window').height / 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height / 6.5,
+    fontWeight: 900,
+  },
+  footer: {
+    marginTop: 165,
+    height: 200,
+  }
 });
