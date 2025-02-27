@@ -7,10 +7,20 @@ import { Image, StyleSheet, View, Dimensions, TouchableOpacity, TextInput, Text,
 import Header from '@/components/Header';
 import React, { useRef, useState } from 'react';
 import styles from '@/app/forms/sighting';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Footer from '@/components/Footer';
 import AutoFiller from '@/components/AutoFiller';
 
+type RootStackParamList = {
+  index: undefined;
+  report: undefined;
+  sighting: undefined;
+  Home: undefined;
+};
 
 export default function SimpleFormScreen() {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   let allSpeciesForDropdown: React.JSX.Element[] = [];
   const [extraInformation, setExtraInformation] = useState('');
   const [dd, setDD] = useState('');
@@ -24,7 +34,7 @@ export default function SimpleFormScreen() {
   const [dropdownVisible, setDropdownVisible] = useState(false); 
   const [speciesDropdownOption, setSpecies] = useState('Species');
   const [sizeDropdownOption, setSize] = useState('Size');
-  const [behaviourDropdownOption, setBehaviour] = useState('Behaviour ');
+  const [behaviourDropdownOption, setBehaviour] = useState('Behaviour');
   const [speciesDropdown, setSpeciesDropdown] = useState(false);
   const [sizeDropdown, setSizeDropdown] = useState(false);
   const [behaviourDropdown, setBehaviourDropdown] = useState(false);
@@ -39,8 +49,7 @@ export default function SimpleFormScreen() {
     "Other Chondrichthyans": ['Rays', 'Chimaera'],
     "Guitar Fish": ['Giant Guitarfish', 'Bow Mouth Guitarfish']
   }
-  const listOfSizes = []
-  const listOfBehaviours = []
+  const listOfSizes = [];
 
   const inputRef2 = useRef<TextInput>(null);
   const inputRef3 = useRef<TextInput>(null);
@@ -50,13 +59,16 @@ export default function SimpleFormScreen() {
 
   function notNum(input: any) {
     if (! (/^[0-9]+$/.test(input) || input === 'Backspace' || input === 'Delete' || input === 'Enter' || input === "Shift" || input === "Tab")) {
-      console.log('true')
       return true;
     } else {
-      console.log('fdalse');
       return false;
   
     }
+  }
+
+  function filterLetters(state: any) {
+    state = state.replace(/[^0-9]/g, '');
+    return state;
   }
 
   function loadSharkSpecies() {
@@ -81,6 +93,24 @@ export default function SimpleFormScreen() {
       </View>
     ));
   }
+  const listOfBehaviours: string[] = [ 'Sleeping', 'Circling', 'Feeding' ];
+
+
+  function loadBehaviours() {
+    return listOfBehaviours.map((behaviour, index) => (
+      <TouchableOpacity
+        key={index}
+        style={{ display: 'flex' }}
+        onPress={() => {
+          setBehaviour(behaviour);
+          setSearchText('');
+          setTimeout(() => setBehaviourDropdown(false), 25);
+        }}
+      >
+        <Text style={styles.dropdownOption}>{behaviour}</Text>
+      </TouchableOpacity>
+    ));
+  }
 
   return (
     <View style={styles.page}>
@@ -90,88 +120,111 @@ export default function SimpleFormScreen() {
           <View style={styles.geographicalTime}>
             <Text style={styles.headerText}>Geographical/Time</Text>
             <Text style={styles.subHeaderText}>Date</Text>
-            <View style={styles.inputNumberContainer} id="date">
-              <TextInput
-                style={[styles.inputNumber, styles.marginLeftMover]}
-                onSubmitEditing={() => inputRef2.current?.focus()}
-                placeholder={"dd"}
-                onChangeText={setDD}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType={'numeric'}
-                maxLength={2}
-                returnKeyType="next"
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                  console.log(event.nativeEvent.key);
-                }}}
-              />
-              <Text style={styles.separator}>/</Text>
-              <TextInput
-                ref={inputRef2}
-                style={[styles.inputNumber, styles.minimalMarginLeftMover]}
-                onSubmitEditing={() => inputRef3.current?.focus()}
-                onChangeText={setMM}
-                placeholder={"mm"}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType={'numeric'}
-                maxLength={2}
-                returnKeyType="next"
-                textContentType="birthdateMonth"
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                  console.log(event.nativeEvent.key);
-                }}}
-              />
-              <Text style={[styles.separator]}>/</Text>
-              <TextInput
-                ref={inputRef3}
-                style={[styles.inputNumber, styles.inputDateYear, styles.minimalMarginLeftMover]}
-                onSubmitEditing={() => inputRef4.current?.focus()}
-                onChangeText={setYYYY}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                placeholder={"yyyy"}
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                  console.log(event.nativeEvent.key);
-                }}}
-                maxLength={4}
-                returnKeyType="next"
-              />
-            </View>
+            <View style={[styles.date, styles.inputs]}>
+              <View style={styles.inputNumberContainer} id="date">
+                <TextInput
+                  style={[styles.inputNumber, styles.marginLeftMover]}
+                  onSubmitEditing={() => inputRef2.current?.focus()}
+                  placeholder={"dd"}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setDD(filtered)}}
+                  value={dd}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType={'numbers-and-punctuation'}
+                  maxLength={2}
+                  returnKeyType="next"
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+                <Text style={styles.separator}>/</Text>
+                <TextInput
+                  ref={inputRef2}
+                  style={[styles.inputNumber, styles.minimalMarginLeftMover]}
+                  onSubmitEditing={() => inputRef3.current?.focus()}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setMM(filtered)}}
+                  value={mm}
+                  placeholder={"mm"}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType={'numbers-and-punctuation'}
+                  maxLength={2}
+                  returnKeyType="next"
+                  textContentType="birthdateMonth"
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+                <Text style={[styles.separator]}>/</Text>
+                <TextInput
+                  ref={inputRef3}
+                  style={[styles.inputNumber, styles.inputDateYear, styles.minimalMarginLeftMover]}
+                  onSubmitEditing={() => inputRef4.current?.focus()}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setYYYY(filtered)}}
+                  value={yyyy}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  placeholder={"yyyy"}
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                  maxLength={4}
+                  returnKeyType="next"
+                  keyboardType={'numbers-and-punctuation'}
+                />
+              </View>
+              <View style={styles.autoFiller}>
+                <TouchableOpacity onPress={(event) => {
+                  console.log(event)
+                  setDD(new Date().getDate().toString());
+                  setMM((new Date().getMonth() + 1).toString());
+                  setYYYY(new Date().getFullYear().toString());
+                }}>
+                <Text>📅</Text>
+                </TouchableOpacity>
+              </View>
+            </View>  
+            
             <Text style={styles.subHeaderText}>Time</Text>
-            <View style={styles.inputNumberContainer} id="time">
-              <TextInput
-                ref={inputRef4}
-                style={[styles.inputNumber, styles.marginLeftMover]}
-                onSubmitEditing={() => inputRef5.current?.focus()}
-                onChangeText={setHH}
-                placeholder={"hh"}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="default"
-                returnKeyType="next"
-                maxLength={2}
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                  console.log(event.nativeEvent.key);
-                }}}
-              />
-              <Text style={[styles.separator, styles.minimalMarginLeftMover]}>:</Text>
-              <TextInput 
-                ref={inputRef5}
-                style={[styles.inputNumber, styles.minimalMarginLeftMover]}
-                onSubmitEditing={() => inputRef6.current?.focus()}
-                onChangeText={setMin}
-                placeholder={"mm"}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="default"
-                returnKeyType="next"
-                maxLength={2}
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                  console.log(event.nativeEvent.key);
-                }}}
-              />
-              
+            <View style={[styles.time, styles.inputs]}>
+              <View style={styles.inputNumberContainer} id="time">
+                <TextInput
+                  ref={inputRef4}
+                  style={[styles.inputNumber, styles.marginLeftMover]}
+                  onSubmitEditing={() => inputRef5.current?.focus()}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setHH(filtered)}}
+                  value={hh}
+                  placeholder={"hh"}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType="numbers-and-punctuation"
+                  returnKeyType="next"
+                  maxLength={2}
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+                <Text style={[styles.separator, styles.minimalMarginLeftMover]}>:</Text>
+                <TextInput 
+                  ref={inputRef5}
+                  style={[styles.inputNumber, styles.minimalMarginLeftMover]}
+                  onSubmitEditing={() => inputRef6.current?.focus()}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setMin(filtered)}}
+                  value={min}
+                  placeholder={"mm"}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType="numbers-and-punctuation"
+                  returnKeyType="next"
+                  maxLength={2}
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+              </View>
+              <View style={styles.autoFiller}>
+                <TouchableOpacity onPress={(event) => {
+                  setHH(new Date().getHours().toString());
+                  setMin(new Date().getMinutes().toString() === '0' ? '00' : new Date().getMinutes().toString());
+                }}>
+                <Text>🕒</Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <Text style={styles.subHeaderText}>Location</Text>
             <View style={styles.inputLocationContainer} id="location">
@@ -179,26 +232,26 @@ export default function SimpleFormScreen() {
                 ref={inputRef6}
                 style={[styles.locationInput]}
                 placeholder={'Longitude'}
-                onChangeText={setLongitude}
+                onChangeText={(text) => {const filtered = filterLetters(text); setLongitude(filtered)}}
+                value={longitude}
                 placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="numeric"
+                keyboardType="numbers-and-punctuation"
                 returnKeyType="next"
                 onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
                   event.preventDefault();
-                  console.log(event.nativeEvent.key);
                 }}}
               />
               <Text style={styles.locationSeparator}>N</Text>
               <TextInput
                 style={[styles.locationInput]}
                 placeholder={'Latitude'}
-                onChangeText={setLatitude}
+                onChangeText={(text) => {const filtered = filterLetters(text); setLatitude(filtered)}}
+                value={latitude}
                 placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="numeric"
+                keyboardType="numbers-and-punctuation"
                 returnKeyType="done"
                 onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
                   event.preventDefault();
-                  console.log(event.nativeEvent.key);
                 }}}
               />
               <Text style={styles.locationSeparator}>W</Text>
@@ -211,7 +264,6 @@ export default function SimpleFormScreen() {
             </TouchableOpacity>
             { speciesDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="speciesDropdown" >
               <TextInput style={styles.searchBar} placeholderTextColor={'rgb(112, 112, 112)'} placeholder={'Search...'} onChangeText={(text) => {setSearchText(text)}}/* onKeyPress={(event) => {
-                console.log('-----------------------------\n\n\n')
                 for (const option of allSpeciesForDropdown) {
                   for (const species of option.props.children[1]) {
                     if  (!(species.props.children.props.children.includes(searchText))) {
@@ -230,9 +282,14 @@ export default function SimpleFormScreen() {
             <TouchableOpacity style={[styles.sizeSelector, styles.selector]} onPress={() => setSizeDropdown(!sizeDropdown)}>
               <Text>Size</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.behaviourSelector, styles.selector]}>
-              <Text>Behaviour</Text>
+            <TouchableOpacity style={[styles.behaviourSelector, styles.selector]} onPress={() => setBehaviourDropdown(!behaviourDropdown)} >
+              <Text>{behaviourDropdownOption}</Text>
             </TouchableOpacity>
+            { behaviourDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="behaviourDropdown">
+              <TextInput style={styles.searchBar} placeholderTextColor={'rgb(112, 112, 112)'} placeholder={'Search...'} onChangeText={(text) => {setSearchText(text)}}/>
+             { loadBehaviours() }
+            </View> ) }
+
           </View>
           <View style={styles.descriptionSelectors}></View>
           <View style={styles.extras}>
@@ -251,20 +308,18 @@ export default function SimpleFormScreen() {
           </View>
         </View>
         <View style={styles.chooseSubmitTypeContainer}>
-          <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>        
+          {/*<TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>        
             <Text style={styles.chooseSubmitType}>Choose Submit Type</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>*/}
           {dropdownVisible && (
             <View style={styles.dropdown}>
               <TouchableOpacity onPress={() => {
                 setSubmitType('mongodb')
-                console.log(submitType)
               }}>
                 <Text style={styles.submitDropdownOption}>MongoDB (Coded)</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
                 setSubmitType('xano')
-                console.log(submitType)
               }}>
                 <Text style={styles.submitDropdownOption}>Xano (Backendless)</Text>
               </TouchableOpacity>
@@ -274,11 +329,11 @@ export default function SimpleFormScreen() {
         <View style={styles.submitButtonContainer}>
           <TouchableOpacity
             onPress={() => {
-              const apiLink: { [key in typeof submitType]: string } = {
+              /*const apiLink: { [key in typeof submitType]: string } = {
                 mongodb: 'https://sharkproject.tactor.dev/api/addShark',
                 xano: 'https://x8ki-letl-twmt.n7.xano.io/api:2D0WNQvF/shark_data',
                 testing: 'http://localhost:3000/',
-              }
+              }*/
               /*fetch('http://localhost:3000/', {
                 method: 'POST',
                 headers: {
@@ -299,9 +354,9 @@ export default function SimpleFormScreen() {
                   time: `${hh}:${min}`,
                   extraInformation: extraInformation,
                   location: `${longitude}, ${latitude}`,
-                  species: speciesDropdownOption,
+                  species: speciesDropdownOption !== "Species"? speciesDropdownOption : "Unset",
                   size: 'n/a',
-                  behaviour: 'n/a',
+                  behaviour: behaviourDropdownOption !== "Behaviour" ? behaviourDropdownOption : "Unset",
                 }),
               })
               .then(response => response.json())
@@ -312,6 +367,9 @@ export default function SimpleFormScreen() {
                 console.error('Error:', error);
                 console.log(submitType)
               });
+
+              
+              navigation.navigate('Home');
             }}
             style={styles.submitButton}
           >
@@ -319,6 +377,7 @@ export default function SimpleFormScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Footer />
     </View>
   );
 }

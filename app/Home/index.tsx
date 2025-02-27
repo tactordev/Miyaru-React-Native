@@ -2,9 +2,9 @@ import { View, Image, StyleSheet, Dimensions, Text, Alert, TouchableOpacity } fr
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import * as Font from 'expo-font';
 import { useEffect } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 
 type RootStackParamList = {
   index: undefined;
@@ -13,14 +13,12 @@ type RootStackParamList = {
 };
 
 export default function HomeScreen() {
-
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   function changeScreen(id: string) {
     if (id === "sighting") {
       console.log("sighting")
       navigation.navigate('sighting');
-
     } else {
       console.log("alert")
       console.log(id)
@@ -43,27 +41,15 @@ export default function HomeScreen() {
         <Image source={require('@/assets/images/miyaru/homeBackground.png')} style={styles.backgroundImage} />
       </View>
       <Header />
-
-      
-      
-
       <View style={styles.titleContainer}>
         <Text style={{color: "#fff", fontSize: 25, fontWeight: 700, margin: 30, textAlign: 'center', fontFamily: 'Poppins-Medium', lineHeight: 40}}>Welcome to the Miyaru Shark App!</Text>
       </View>
-
-      
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.changeScreenButton} onPress={() => changeScreen('sighting')}>
           <Text nativeID="sighting" style={[styles.button, {fontFamily: 'Poppins-Medium'}]}>Submit Sighting</Text>
         </TouchableOpacity>
       </View>
-
-      <LinearGradient 
-        colors={['transparent', '#020a33', '#020a33', '#020a33']}
-        style={styles.footer}
-      >
-        <Image source={require('@/assets/images/miyaru/footer.png')} style={{width: Dimensions.get('window').width, height: 200}} />
-      </LinearGradient>
+      <Footer />
     </View>
   );
 }
@@ -111,9 +97,5 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height / 6.5,
     fontWeight: 900,
-  },
-  footer: {
-    marginTop: 165,
-    height: 200,
   }
 });

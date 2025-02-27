@@ -58,18 +58,25 @@ export default StyleSheet.create({
       width: 100,
     },
     locationSeparator: {
+      display: 'flex',
+      flexDirection: 'row',
       backgroundColor: '#d9d9d9',
       width: 25,
       borderRadius: 25,
       color: 'rgb(94, 94, 94)',
       textAlign: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 6.5,
       marginLeft: 12.5,
     },
     locationInput: {
       backgroundColor: '#d9d9d9',
       width: 125,
+      height: 30,
       marginLeft: 12.5,
       textAlign: 'center',
+      borderRadius: 5,
     },
   
     minimalMarginLeftMover: {
@@ -86,7 +93,7 @@ export default StyleSheet.create({
       alignItems: 'center',
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height / 7.5,
-      marginLeft: -20,
+      marginLeft: -10,
       borderRadius: 10,
     },
     inputText: {
@@ -110,8 +117,8 @@ export default StyleSheet.create({
     inputNumber: {
       textAlign: 'center',
       backgroundColor: '#d9d9d9',
-      width: 25,
-      height: 25,
+      width: 35,
+      height: 30,
       borderRadius: 5,
     },
     inputDateYear: {
@@ -168,6 +175,22 @@ export default StyleSheet.create({
       backgroundColor: 'rgb(199, 199, 199)',
       color: '#000',
       padding: 12,
-    }
+    },
+    inputs: {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginRight: 10,
+    },
+    autoFiller: {
+      backgroundColor: '#00c2ff',
+      padding: 7.5,
+      borderRadius: 10,
+      color: 'black',
+      textShadowColor: 'black',
+      fontWeight: 700,
+      textShadowOffset: { width: 0, height: 0 },
+    },
   });
   

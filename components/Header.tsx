@@ -5,13 +5,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 type RootStackParamList = {
     index: undefined;
     report: undefined;
+    Home: undefined;
 };
 
 export default function Header() {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     const homeRedirect = () => {
-        navigation.navigate('index');
+        navigation.navigate('Home');
     }
     return (
        <TouchableOpacity onPress={homeRedirect}>
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     },
     headerImage: {
         width: Dimensions.get('window').width / 1.5,
-        height: Dimensions.get('window').height / 11,
+        height: Dimensions.get('window').width / 5,
         top: 15,
     }
 })
