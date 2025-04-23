@@ -6,11 +6,11 @@
 import { Image, StyleSheet, View, Dimensions, TouchableOpacity, TextInput, Text, ScrollView } from 'react-native';
 import Header from '@/components/Header';
 import React, { useRef, useState } from 'react';
-import styles from '@/app/forms/sighting';
+import styles from '@/app/styles/sighting';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Footer from '@/components/Footer';
-import AutoFiller from '@/components/AutoFiller';
+import * as ImagePicker from "expo-image-picker";
 
 type RootStackParamList = {
   index: undefined;
@@ -40,16 +40,17 @@ export default function SimpleFormScreen() {
   const [behaviourDropdown, setBehaviourDropdown] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState('');
+  const [colourInformation, setColourInformation] = useState('');
+  const [scarInformation, setScarInformation] = useState('');
 
   const listOfSpecies:{ [key: string]: string[] } = {
-    ReefSharks: ["Blacktip reef shark", "Whitetip reef shark", "Gray reef shark"],
+    "Reef Sharks": ["Blacktip reef shark", "Whitetip reef shark", "Gray reef shark"],
     "Pelagic Sharks": ["Silky Shark", "Oceanic Whitetip Shark", "Tiger Shark", "Hammerhead Shark", "Whale Shark"],
     "Deepwater Sharks": ['Gulper Shark'],
     "Ground Sharks": ['Nurse Shark', 'Leopard Shark'],
     "Other Chondrichthyans": ['Rays', 'Chimaera'],
     "Guitar Fish": ['Giant Guitarfish', 'Bow Mouth Guitarfish']
   }
-  const listOfSizes = [];
 
   const inputRef2 = useRef<TextInput>(null);
   const inputRef3 = useRef<TextInput>(null);
@@ -71,30 +72,36 @@ export default function SimpleFormScreen() {
     return state;
   }
 
+
   function loadSharkSpecies() {
-    return Object.entries(listOfSpecies).map(([category, speciesList]) => (
-      <View key={category}>
-        <Text style={styles.dropdownHeader}>{category}</Text>
-        {speciesList
-          .filter(species => species.toLowerCase().includes(searchText.toLowerCase())) 
-          .map((species, index) => (
-            <TouchableOpacity
-              key={index}
-              style={{ display: 'flex' }}
-              onPress={() => {
-                setSpecies(species);
-                setSearchText('');
-                setTimeout(() => setSpeciesDropdown(false), 25);
-              }}
-            >
-              <Text style={styles.dropdownOption}>{species}</Text>
-            </TouchableOpacity>
-          ))}
-      </View>
-    ));
+    return (
+      <ScrollView style={styles.dropdownList}>
+        {Object.entries(listOfSpecies).map(([category, speciesList]) => (
+          <View key={category}>
+            <Text style={styles.dropdownHeader}>{category}</Text>
+            {speciesList
+              .filter(species => species.toLowerCase().includes(searchText.toLowerCase()))
+              .map((species, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{ display: 'flex' }}
+                  onPress={() => {
+                    setSpecies(species);
+                    setSearchText('');
+                    setTimeout(() => setSpeciesDropdown(false), 25);
+                  }}
+                >
+                  <Text style={styles.dropdownOption}>{species}</Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+        ))}
+      </ScrollView>
+    );
   }
   const listOfBehaviours: string[] = [ 'Sleeping', 'Circling', 'Feeding' ];
 
+ // ADD FILTER HERE - check loadSharkSpecies.
 
   function loadBehaviours() {
     return listOfBehaviours.map((behaviour, index) => (
@@ -112,15 +119,35 @@ export default function SimpleFormScreen() {
     ));
   }
 
+  const listOfSizes: string[] = ['0-1m', '1-2m', '2-5m', '5-15m', '15m+']
+  function loadSizes() {
+    return listOfSizes.map((size, index) => (
+      <ScrollView key={index}>
+        <TouchableOpacity
+          style={{ display: 'flex' }}
+          onPress={() => {
+            setSize(size);
+            setSearchText('');
+            setTimeout(() => setSizeDropdown(false), 25);
+          }}
+        >
+          <Text style={styles.dropdownOption}>{size}</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    ));
+  }
+
   return (
     <View style={styles.page}>
+      <View style={styles.droppedDownArrow}></View>
       <Header />
       <ScrollView style={styles.scrollView}>
         <View style={styles.mainContent}>
+          <>
           <View style={styles.geographicalTime}>
-            <Text style={styles.headerText}>Geographical/Time</Text>
+            <Text style={styles.headerText}>Location/Time</Text>
             <Text style={styles.subHeaderText}>Date</Text>
-            <View style={[styles.date, styles.inputs]}>
+            <View style={[styles.inputs]}>
               <View style={styles.inputNumberContainer} id="date">
                 <TextInput
                   style={[styles.inputNumber, styles.marginLeftMover]}
@@ -183,7 +210,7 @@ export default function SimpleFormScreen() {
             </View>  
             
             <Text style={styles.subHeaderText}>Time</Text>
-            <View style={[styles.time, styles.inputs]}>
+            <View style={[styles.inputs]}>
               <View style={styles.inputNumberContainer} id="time">
                 <TextInput
                   ref={inputRef4}
@@ -220,78 +247,142 @@ export default function SimpleFormScreen() {
               <View style={styles.autoFiller}>
                 <TouchableOpacity onPress={(event) => {
                   setHH(new Date().getHours().toString());
-                  setMin(new Date().getMinutes().toString() === '0' ? '00' : new Date().getMinutes().toString());
+                  setMin(new Date().getMinutes().toString() === '0' ? '00' : new Date().getMinutes().toString().length === 1 ? `0${new Date().getMinutes().toString()}` : new Date().getMinutes().toString());
                 }}>
                 <Text>🕒</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <Text style={styles.subHeaderText}>Location</Text>
-            <View style={styles.inputLocationContainer} id="location">
-              <TextInput
-                ref={inputRef6}
-                style={[styles.locationInput]}
-                placeholder={'Longitude'}
-                onChangeText={(text) => {const filtered = filterLetters(text); setLongitude(filtered)}}
-                value={longitude}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="numbers-and-punctuation"
-                returnKeyType="next"
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                }}}
-              />
-              <Text style={styles.locationSeparator}>N</Text>
-              <TextInput
-                style={[styles.locationInput]}
-                placeholder={'Latitude'}
-                onChangeText={(text) => {const filtered = filterLetters(text); setLatitude(filtered)}}
-                value={latitude}
-                placeholderTextColor={'rgb(94, 94, 94)'}
-                keyboardType="numbers-and-punctuation"
-                returnKeyType="done"
-                onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
-                  event.preventDefault();
-                }}}
-              />
-              <Text style={styles.locationSeparator}>W</Text>
+            <View style={[styles.inputs]}>
+              <View style={styles.inputLocationContainer} id="location">
+                <TextInput
+                  ref={inputRef6}
+                  style={[styles.locationInput]}
+                  placeholder={'Latitude'}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setLatitude(filtered)}}
+                  value={latitude}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType="numbers-and-punctuation"
+                  returnKeyType="next"
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+                <Text style={styles.locationSeparator}>N</Text>
+                <TextInput
+                  style={[styles.locationInput]}
+                  placeholder={'Longitude'}
+                  onChangeText={(text) => {const filtered = filterLetters(text); setLongitude(filtered)}}
+                  value={longitude}
+                  placeholderTextColor={'rgb(94, 94, 94)'}
+                  keyboardType="numbers-and-punctuation"
+                  returnKeyType="done"
+                  onKeyPress={(event) => {if (notNum(event.nativeEvent.key)) {
+                    event.preventDefault();
+                  }}}
+                />
+                <Text style={styles.locationSeparator}>W</Text>
+              </View>
+              <View style={styles.autoFiller}>
+                <TouchableOpacity onPress={(event) => {
+                  function success(position: any) {
+                    setLongitude(position.coords.longitude.toFixed(3));
+                    setLatitude(position.coords.latitude.toFixed(3));
+                  }
+
+                  function error(err: any) {
+                    console.warn(`ERROR(${err.code}): ${err.message}`)
+                  }
+
+                  navigator.geolocation.getCurrentPosition(success, error);
+                }}>
+                <Text>🧭</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
+          </>
           <View style={styles.sharkInformation}>
             <Text style={styles.headerText}>Shark Information</Text>
-            <TouchableOpacity style={[styles.speciesSelector, styles.selector]} onPress={() => setSpeciesDropdown(!speciesDropdown)}>
-              <Text>{speciesDropdownOption}</Text>
-            </TouchableOpacity>
-            { speciesDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="speciesDropdown" >
-              <TextInput style={styles.searchBar} placeholderTextColor={'rgb(112, 112, 112)'} placeholder={'Search...'} onChangeText={(text) => {setSearchText(text)}}/* onKeyPress={(event) => {
-                for (const option of allSpeciesForDropdown) {
-                  for (const species of option.props.children[1]) {
-                    if  (!(species.props.children.props.children.includes(searchText))) {
-                      
+            <View>
+              <TouchableOpacity style={[styles.speciesSelector, styles.selector]} onPress={() => {setSizeDropdown(false); setBehaviourDropdown(false); setSpeciesDropdown(!speciesDropdown)}}>
+                <Text style={[styles.chosenSelectorOption]}>{speciesDropdownOption}</Text>
+              </TouchableOpacity>
+              { speciesDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="speciesDropdown" >
+                <TextInput style={styles.searchBar} placeholderTextColor={'rgb(112, 112, 112)'} placeholder={'Search...'} onChangeText={(text) => {setSearchText(text)}}/* onKeyPress={(event) => {
+                  for (const option of allSpeciesForDropdown) {
+                    for (const species of option.props.children[1]) {
+                      if  (!(species.props.children.props.children.includes(searchText))) {
+                        
 
-                    } else {
-                      species.props.style = {display: 'flex'}
+                      } else {
+                        species.props.style = {display: 'flex'}
+                      }
                     }
+                    
                   }
-                  
-                }
-              }}*//>
-              { loadSharkSpecies() }
+                }}*//>
+                { loadSharkSpecies() }
 
-            </View> ) }
-            <TouchableOpacity style={[styles.sizeSelector, styles.selector]} onPress={() => setSizeDropdown(!sizeDropdown)}>
-              <Text>Size</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.behaviourSelector, styles.selector]} onPress={() => setBehaviourDropdown(!behaviourDropdown)} >
-              <Text>{behaviourDropdownOption}</Text>
-            </TouchableOpacity>
-            { behaviourDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="behaviourDropdown">
-              <TextInput style={styles.searchBar} placeholderTextColor={'rgb(112, 112, 112)'} placeholder={'Search...'} onChangeText={(text) => {setSearchText(text)}}/>
-             { loadBehaviours() }
-            </View> ) }
+              </View> ) }
+            </View>
+            <View>
+              <TouchableOpacity style={[styles.sizeSelector, styles.selector]} onPress={(e: any) => {
+                setSpeciesDropdown(false);
+                setBehaviourDropdown(false);
+                setSizeDropdown(!sizeDropdown);
+
+                }}>
+              <Text style={[styles.chosenSelectorOption]}>{sizeDropdownOption}</Text>
+              <Text style={[styles.dropdownArrow]}></Text>
+              </TouchableOpacity>
+              { sizeDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="sizeDropdown" >
+                { loadSizes() }
+              </View> ) }
+            </View>
+            <View>
+              <TouchableOpacity style={[styles.behaviourSelector, styles.selector]} onPress={() => {setSpeciesDropdown(false); setBehaviourDropdown(false); setBehaviourDropdown(!behaviourDropdown);}} >
+              <Text style={[styles.chosenSelectorOption]}>{behaviourDropdownOption}</Text>
+              </TouchableOpacity>
+              { behaviourDropdown && (<View style={[styles.dropdown, styles.speciesDropdown]} id="behaviourDropdown">
+              { loadBehaviours() }
+              </View> ) }
+            </View>
 
           </View>
-          <View style={styles.descriptionSelectors}></View>
+          <View style={styles.sharkIdentification}>
+            <Text style={styles.headerText}>Shark Identification</Text>
+            <Text style={styles.subHeaderText}>Colour</Text>
+            <View style={styles.inputColour} id="sharkIdentification">
+              <TextInput
+              style={styles.colourInput}
+              placeholder={"Enter colour here..."}
+              placeholderTextColor={'rgb(94, 94, 94)'}
+              keyboardType="default"
+              onChangeText={setColourInformation}
+              value={colourInformation}
+              />
+            </View>
+            <Text style={styles.subHeaderText}>Notable Scars/Stripes</Text>
+            <View style={styles.inputScar} id="scarIdentification">
+              <TextInput
+                style={styles.colourInput}
+                placeholder={"Write here..."}
+                placeholderTextColor={'rgb(94, 94, 94)'}
+                keyboardType="default"
+                onChangeText={setScarInformation}
+                value={scarInformation}
+              />  
+            </View>
+          </View>
+          <View style={styles.addPhotoContainer}>
+            <Text style={[styles.headerText, styles.photoHeader]}>Add Photo</Text>
+              <TouchableOpacity onPress={() => {}} style={styles.addPhoto}>
+                <Image source={require('@/assets/images/photo.png')} style={styles.addPhotoPhoto} />
+                <Text style={[styles.addPhotoText]}>Add Photo</Text>
+              </TouchableOpacity>
+          </View>
           <View style={styles.extras}>
             <Text style={styles.headerText}>Extras</Text>
             <View style={styles.inputTextContainer} id="extraInformation">

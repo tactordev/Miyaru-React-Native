@@ -42,11 +42,11 @@ export default function HomeScreen() {
       </View>
       <Header />
       <View style={styles.titleContainer}>
-        <Text style={{color: "#fff", fontSize: 25, fontWeight: 700, margin: 30, textAlign: 'center', fontFamily: 'Poppins-Medium', lineHeight: 40}}>Welcome to the Miyaru Shark App!</Text>
+        <Text style={{color: "#fff", fontSize: 25, fontWeight: 700, margin: 30, textAlign: 'center', alignItems: 'center', fontFamily: 'Poppins-Medium', lineHeight: 45, height: 100, marginTop: 35,}}>Welcome to the Miyaru Shark App!</Text>
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.changeScreenButton} onPress={() => changeScreen('sighting')}>
-          <Text nativeID="sighting" style={[styles.button, {fontFamily: 'Poppins-Medium'}]}>Submit Sighting</Text>
+          <Text nativeID="sighting" style={[styles.button, {fontFamily: 'Poppins-Medium', fontWeight: 600, fontSize: 15}]}>Submit Sighting</Text>
         </TouchableOpacity>
       </View>
       <Footer />
@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     fontStyle: 'normal',
     fontSize: 15,
+    lineHeight: 20,
   },
   changeScreenButton: { 
     display: 'flex',

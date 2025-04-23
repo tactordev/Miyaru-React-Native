@@ -27,27 +27,54 @@ export default function Footer() {
 const styles = StyleSheet.create({
     footer: {
         position: 'absolute',
-        height: Dimensions.get('window').width / 3,
+        height: Dimensions.get('window').width / 2.75,
         width: Dimensions.get('window').width,
-        marginTop: Dimensions.get('window').height - (Dimensions.get('window').width / 3),
+        marginTop: Dimensions.get('window').height - ((Dimensions.get('window').width / 2.75)),
         zIndex: 10,
     },
+
+    
     footerImage: {
-        width: Dimensions.get('window').width / 3.5,
-        height: Dimensions.get('window').width / 3.5,
-        borderRadius: 100,
+        width: '100%',
+        height: '100%',
+        borderRadius: Dimensions.get('window').width / 7,
     },
     footerImageContainer: {
         display: 'flex',
-        marginLeft: Dimensions.get('window').width - Dimensions.get('window').width / 2.75,
-        bottom: 25,
+
         justifyContent: 'center',
         alignItems: 'center',
-        width: Dimensions.get('window').width / 3,
-        height: Dimensions.get('window').width / 3,
+        width: Dimensions.get('window').width / 3.5,
+        height: Dimensions.get('window').width / 3.5,
         backgroundColor: 'black',
-        borderRadius: 100,
+        borderRadius: Dimensions.get('window').width / 7,
         borderColor: 'white',
         borderWidth: 3,
+        zIndex: 10,
+        marginLeft: Dimensions.get('window').width - Dimensions.get('window').width / 2.75, 
     }
 })
+
+/*
+
+    footerImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: Dimensions.get('window').width / 7,
+    },
+    footerImageContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: Dimensions.get('window').width / 3.5,
+        height: Dimensions.get('window').width / 3.5,
+        backgroundColor: 'black',
+        borderRadius: Dimensions.get('window').width / 7,
+        borderColor: 'white',
+        borderWidth: 3,
+        zIndex: 10,
+        overflow: 'hidden',
+    }
+});
+
+*/

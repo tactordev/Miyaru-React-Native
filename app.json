@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MiyaruSharkConservation",
-    "slug": "MiyaruSharkConservation",
+    "slug": "miyaru-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,13 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.miyarusharktactor.miyaruapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.miyarusharktactor.miyaruapp"
     },
     "web": {
       "bundler": "metro",
@@ -43,7 +48,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "65f82a87-7bab-454b-9e84-288dfa1301ea"
+        "projectId": "3f73a31b-956c-48c7-8642-a847faa588e6"
       }
     },
     "runtimeVersion": {
@@ -51,6 +56,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/65f82a87-7bab-454b-9e84-288dfa1301ea"
-    }
+    },
+    "owner": "miyarushark-tactor"
   }
 }
