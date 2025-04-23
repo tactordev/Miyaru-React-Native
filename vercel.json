@@ -1,0 +1,9 @@
+{
+    "build": {
+      "outputDirectory": "web-build",
+      "commands": ["npm run web"] 
+    },
+    "routes": [
+      { "src": "/(.*)", "dest": "/index.html" }
+    ]
+  }
