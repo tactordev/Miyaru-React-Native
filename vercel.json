@@ -1,8 +1,8 @@
 {
     "build": {
-      "outputDirectory": "web-build",
-      "commands": ["npm run web"] 
+      "commands": ["npm run web"]
     },
+    "outputDirectory": "web-build", 
     "routes": [
       { "src": "/(.*)", "dest": "/index.html" }
     ]
